@@ -21,6 +21,8 @@ function renderIndex(htmlFile, data, cb) {
     });
 }
 
+var collMissionSparql = 'http://data.bioversityinternational.org:3000/collectingmissions/query';
+
 connect()
 
 .use(connect.static('public'))
@@ -44,25 +46,49 @@ connect()
         req.pipe(request('http://data.bioversityinternational.org:3000/ontology/query' + urlParts.search)).pipe(res);
     });
     app.get('/collectingmissions', function (req, res, next) {
-        renderIndex('skins/cm.html', {}, function(html) {
-            res.end(html);
+        var sparql = 'SELECT  DISTINCT ?type WHERE {\
+            ?s a ?type .\
+            }\
+            LIMIT 100';
+
+        request(collMissionSparql + '?query=' + sparql +'&output=json', function(err, response, body) {
+            var j = JSON.parse(body);
+
+            res.writeHead(200, {
+                'Content-Type': 'text/html',
+            }); 
+            renderIndex('skins/cm.html', j.results, function(html) {
+                res.end(html);
+            });
+        
         });
     });
     // SPARQL
     app.get('/collectingmissions/query', function (req, res, next) {
         var urlParts = url.parse(req.url, true);
 
-        req.pipe(request('http://data.bioversityinternational.org:3000/collectingmissions/query' + urlParts.search)).pipe(res);
+        req.pipe(request(collMissionSparql + urlParts.search)).pipe(res);
     });
     // Linked Data
     app.get('/collectingmissions*', function (req, res, next) {
         var hostname = req.headers.host; // hostname = 'localhost:8080'
+        // XXX pathname probably needs to be uri encoded with encodeURIComponent
         var pathname = url.parse(req.url).pathname; // pathname = '/MyApp'
         var uri = 'http://' + hostname + pathname;
 
         // send it to SPARQL DESCRIBE <>
-        var sparql = 'DESCRIBE <'+uri+'>';
-        req.pipe(request('http://data.bioversityinternational.org:3000/collectingmissions/query?query=' + sparql)).pipe(res);
+        var acceptHeader = req.headers.accept;
+        if(acceptHeader.match(/text\/html/g)) {
+            // need the actual XLS version so not using construct
+            var stylesheet = '&output=xml&stylesheet=%2Fxml-to-html-links.xsl';
+            var query = 'SELECT * WHERE { { <'+uri+'> ?p1 ?o1 } UNION { ?s2 ?p2 <'+uri+'> } }';
+            query = query + stylesheet;
+
+        } else {
+            //var query = 'DESCRIBE <'+uri+'>';
+            var query = 'construct { <'+uri+'> ?p1 ?o1 . ?s2 ?p2 <'+uri+'> } { { <'+uri+'> ?p1 ?o1 } UNION { ?s2 ?p2 <'+uri+'> } }';
+        }
+        req.pipe(request(collMissionSparql + '?query=' + query)).pipe(res);
 
     });
 

@@ -1,4 +1,17 @@
-SPARQL:
+<h2>Collecting Missions database</h2>
+Start browsing this Linked Data repository by following the links below:
+<br>
+<br>
+
+{{#bindings}}
+
+<a href="{{type.value}}">{{type.value}}</a><br>
+{{/bindings}}
+<br>
+
+or perform a SPARQL query:
+<br>
+
 <form action="/collectingmissions/query" method="GET" accept-charset="UTF-8" target="_blank">
         <textarea name="query" cols="70" rows="10">SELECT  DISTINCT ?type WHERE {
     ?s a ?type .
