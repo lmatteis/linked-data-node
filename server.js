@@ -41,10 +41,7 @@ connect()
     app.get('/ontology/query', function (req, res, next) {
         var urlParts = url.parse(req.url, true);
 
-        request('http://data.bioversityinternational.org:3000/ontology/query' + urlParts.search, function(error, response, body) {
-
-            res.end(body);
-        });
+        req.pipe(request('http://data.bioversityinternational.org:3000/ontology/query' + urlParts.search)).pipe(res);
     });
     app.get('/collectingmissions', function (req, res, next) {
         renderIndex('skins/cm.html', {}, function(html) {
@@ -55,10 +52,7 @@ connect()
     app.get('/collectingmissions/query', function (req, res, next) {
         var urlParts = url.parse(req.url, true);
 
-        request('http://data.bioversityinternational.org:3000/collectingmissions/query' + urlParts.search, function(error, response, body) {
-
-            res.end(body);
-        });
+        req.pipe(request('http://data.bioversityinternational.org:3000/collectingmissions/query' + urlParts.search)).pipe(res);
     });
     // Linked Data
     app.get('/collectingmissions*', function (req, res, next) {
@@ -68,10 +62,7 @@ connect()
 
         // send it to SPARQL DESCRIBE <>
         var sparql = 'DESCRIBE <'+uri+'>';
-        request('http://data.bioversityinternational.org:3000/collectingmissions/query?query=' + sparql, function(error, response, body) {
-            res.end(body);
-
-        });
+        req.pipe(request('http://data.bioversityinternational.org:3000/collectingmissions/query?query=' + sparql)).pipe(res);
 
     });
 
