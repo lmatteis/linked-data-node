@@ -1,0 +1,14 @@
+body #sites-header-title h2 { 
+    vertical-align: middle;
+    line-height: 85px;
+    font-size: 26px!important;
+    font-weight: bold;
+}
+
+#sites-header-title 
+{
+    width: 100% !important;
+}
+#sites-header-title img {
+    float: right;
+}

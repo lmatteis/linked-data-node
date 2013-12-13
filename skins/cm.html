@@ -1,0 +1,30 @@
+SPARQL:
+<form action="/collectingmissions/query" method="GET" accept-charset="UTF-8" target="_blank">
+        <textarea name="query" cols="70" rows="10">SELECT  DISTINCT ?type WHERE {
+    ?s a ?type .
+}
+LIMIT 100
+        </textarea>
+        <br>
+
+        Output: <select name="output">
+          <option value="text">Text</option>
+          <option value="json">JSON</option>
+          <option value="xml">XML</option>
+          <option value="csv">CSV</option>
+          <option value="tsv">TSV</option>
+        </select>
+        <br>
+        If XML output, add XSLT style sheet (blank for none): 
+        <select name="stylesheet">
+          <option value=""></option>
+          <option value="/xml-to-html.xsl">xml-to-html</option>
+          <option value="/xml-to-html-links.xsl">xml-to-html-links</option>
+          <option value="/xml-to-html-plain.xsl">xml-to-html-plain</option>
+        </select>
+        <br>
+        <input type="checkbox" name="force-accept" value="text/plain">
+        Force the accept header to <tt>text/plain</tt> regardless.
+        <br>
+        <input type="submit" value="Get Results">
+      </form>
